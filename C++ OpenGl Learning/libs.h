@@ -17,3 +17,11 @@
 #include<gtc\type_ptr.hpp>
 
 #include<Soil2.h>
+
+
+struct  Vertex
+{
+	glm::vec3 position;
+	glm::vec3 color;
+	glm::vec2 texcoord;
+};

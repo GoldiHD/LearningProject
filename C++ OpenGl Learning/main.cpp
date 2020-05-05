@@ -1,15 +1,40 @@
 #include "libs.h"
 
+Vertex vertices[] =
+{
+	//Position						//Color
+	glm::vec3(0.0f, 0.5f, 0.f),		glm::vec3(1.f,0.f,0.f),		glm::vec2(0.f, 1.f),
+	glm::vec3(-0.5f, -0.5f, 0.f),	glm::vec3(0.f,1.f,0.f),		glm::vec2(0.f, 0.f),
+	glm::vec3(0.5f, -0.5f, 0.f),    glm::vec3(1.f,0.f,1.f),		glm::vec2(1.f, 0.f)
+};
+
+unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
+
+GLuint indices[] =
+{
+	0, 1, 2,	//Triangle 1
+};
+
+
+void updateInput(GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+}
+
 bool loadShader(GLuint& program)
 {
+	bool loadSuccess = true;
 	char infoLog[512];
 	GLint success;
-
 
 	std::string temp = "";
 	std::string src = "";
 
 	std::ifstream in_file;
+
 
 	//vertex
 	in_file.open("vertex_core.glsl");
@@ -17,40 +42,87 @@ bool loadShader(GLuint& program)
 	if (in_file.is_open())
 	{
 		while (std::getline(in_file, temp))
-		{
 			src += temp + "\n";
-		}
 	}
 	else
 	{
 		std::cout << "ERROR::LOADSHADERS::COULD_NOT_OPEN_VERTEX_FILE" << "\n";
+		loadSuccess = false;
 	}
 
 	in_file.close();
-	GLuint vertextShader = glCreateShader(GL_VERTEX_SHADER);
-	const GLchar* vertSrc = src.c_str();
-	glShaderSource(vertextShader, 1, &vertSrc, NULL);
-	glCompileShader(vertextShader);
 
-	glGetShaderiv(vertextShader, GL_COMPILE_STATUS, &success);
+	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	const GLchar* vertSrc = src.c_str();
+	glShaderSource(vertexShader, 1, &vertSrc, NULL);
+	glCompileShader(vertexShader);
+
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
-		glGetShaderInfoLog(vertextShader, 512, NULL, infoLog);
+		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		std::cout << "ERROR::LOADSHADERS::COULD_NOT_COMPILE_VERTEX_SHADER" << "\n";
 		std::cout << infoLog << "\n";
+		loadSuccess = false;
 	}
 
 	temp = "";
 	src = "";
 
 	//Fragment
+	in_file.open("fragment_core.glsl");
 
+	if (in_file.is_open())
+	{
+		while (std::getline(in_file, temp))
+			src += temp + "\n";
+	}
+	else
+	{
+		std::cout << "ERROR::LOADSHADERS::COULD_NOT_OPEN_FRAGMENT_FILE" << "\n";
+		loadSuccess = false;
+	}
+
+	in_file.close();
+
+	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	const GLchar* fragSrc = src.c_str();
+	glShaderSource(fragmentShader, 1, &fragSrc, NULL);
+	glCompileShader(fragmentShader);
+
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+	if (!success)
+	{
+		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		std::cout << "ERROR::LOADSHADERS::COULD_NOT_COMPILE_FRAGMENT_SHADER" << "\n";
+		std::cout << infoLog << "\n";
+		loadSuccess = false;
+	}
 
 
 	//Program
+	program = glCreateProgram();
+
+	glAttachShader(program, vertexShader);
+	glAttachShader(program, fragmentShader);
+
+	glLinkProgram(program);
+
+	glGetProgramiv(program, GL_LINK_STATUS, &success);
+	if (!success)
+	{
+		glGetProgramInfoLog(program, 512, NULL, infoLog);
+		std::cout << "ERROR::LOADSHADERS::COULD_NOT_LINK_PROGRAM" << "\n";
+		std::cout << infoLog << "\n";
+		loadSuccess = false;
+	}
 
 	//End
-	glDeleteShader(vertextShader);
+	glUseProgram(0);
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+
+	return loadSuccess;
 }
 
 
@@ -87,21 +159,53 @@ int main()
 		glfwTerminate();
 	}
 
+	//OPENGL OPTIONS
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+
+	glEnable(GL_BLEND);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	//Shader Init
 	GLuint core_program;
-	loadShader(core_program);
+	if (!loadShader(core_program))
+	{
+		glfwTerminate();
+	}
 
 	//Model
 
 
 	//VBO, VBO, ERO
-
-
 	//GEN VAD AND BIND
+	GLuint VAO;
+	glCreateVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+
 
 
 	//GEN VBO AND BIND AND SEND DATA
+	GLuint VBO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+	//GEN EBO AND BIND AND SEND DATA
+	GLuint EBO;
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	//SET VERTEXATTRIBPOINTERS AND ENABLE (Input ASSEMBLY)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+
+	//BIND VAO 0
 
 	//MAIN LOOP
 	while (!glfwWindowShouldClose(window))
@@ -110,11 +214,11 @@ int main()
 		glfwPollEvents();
 
 		//Update
-
+		updateInput(window);
 
 		//DRAW
 		//	CLEAR
-		glClearColor(0.f, 1.f, 0.f, 1.f);
+		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		//	DRAW
@@ -125,6 +229,7 @@ int main()
 	}
 
 	//END OF PROGRAM
+	glfwDestroyWindow(window);
 	glfwTerminate();
 
 
