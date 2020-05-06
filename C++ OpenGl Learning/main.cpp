@@ -15,6 +15,8 @@ GLuint indices[] =
 	0, 1, 2,	//Triangle 1
 };
 
+unsigned nrOfIndices = sizeof(indices) / sizeof(Vertex);
+
 
 void updateInput(GLFWwindow* window)
 {
@@ -184,7 +186,7 @@ int main()
 	//VBO, VBO, ERO
 	//GEN VAD AND BIND
 	GLuint VAO;
-	glCreateVertexArrays(1, &VAO);
+	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
 
@@ -203,9 +205,18 @@ int main()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	//SET VERTEXATTRIBPOINTERS AND ENABLE (Input ASSEMBLY)
+		//Position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+	glEnableVertexAttribArray(0);
+		//Color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
+	glEnableVertexAttribArray(1);
+		//Texcoord
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
+	glEnableVertexAttribArray(2);
 
 	//BIND VAO 0
+	glBindVertexArray(0);
 
 	//MAIN LOOP
 	while (!glfwWindowShouldClose(window))
@@ -213,17 +224,25 @@ int main()
 		//Update input
 		glfwPollEvents();
 
-		//Update
+		//UPDATE --- 
 		updateInput(window);
 
-		//DRAW
-		//	CLEAR
+		//DRAW ---
+		//Clear
 		glClearColor(0.f, 0.f, 0.f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		//	DRAW
+		//Use a program
+		glUseProgram(core_program);
 
-		//	End Draw
+		//Bind vertex array object
+		glBindVertexArray(VAO);
+
+		//Draw
+		glDrawArrays(GL_TRIANGLES, 0, nrOfVertices);
+		//glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
+
+		//End Draw
 		glfwSwapBuffers(window);
 		glFlush();
 	}
