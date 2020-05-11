@@ -6,7 +6,7 @@ Vertex vertices[] =
 	glm::vec3(-0.5f, 0.5f, 0.f),	glm::vec3(1.f,0.f,0.f),		glm::vec2(0.f, 1.f),
 	glm::vec3(-0.5f, -0.5f, 0.f),	glm::vec3(0.f,1.f,0.f),		glm::vec2(0.f, 0.f),
 	glm::vec3(0.5f, -0.5f, 0.f),    glm::vec3(0.f,0.f,1.f),		glm::vec2(1.f, 0.f),
-	glm::vec3(0.5f, 0.5f, 0.f),		glm::vec3(1.f,1.f,0.f),		glm::vec2(1.f, 0.f)
+	glm::vec3(0.5f, 0.5f, 0.f),		glm::vec3(1.f,1.f,0.f),		glm::vec2(0.f, 0.f)
 };
 
 unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
@@ -14,10 +14,10 @@ unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
 GLuint indices[] =
 {
 	0, 1, 2,	
-	0,1,3		
+	0,2,3		
 };
 
-unsigned nrOfIndices = sizeof(indices) / sizeof(Vertex);
+unsigned nrOfIndices = sizeof(indices) / sizeof(GLuint);
 
 
 void updateInput(GLFWwindow* window)
@@ -241,8 +241,8 @@ int main()
 		glBindVertexArray(VAO);
 
 		//Draw
-		//glDrawArrays(GL_TRIANGLES, 0, nrOfVertices);
-		glDrawElements(GL_TRIANGLES, nrOfVertices, GL_UNSIGNED_INT, 0);
+		//glDrawArrays(GL_TRIANGLES, 0, nrOfIndices);
+		glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
 
 		//End Draw
 		glfwSwapBuffers(window);
