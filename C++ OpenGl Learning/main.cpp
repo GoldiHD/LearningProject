@@ -1,4 +1,6 @@
 #include "libs.h"
+#include <list>
+using namespace std;
 
 Vertex vertices[] =
 {
@@ -129,6 +131,37 @@ bool loadShader(GLuint& program)
 	return loadSuccess;
 }
 
+GLuint LoadTexture(const char* texturePath)
+{
+	int image_width = 0;
+	int image_height = 0;
+	unsigned char* image = SOIL_load_image(texturePath, &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	if (image)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "ERROR::TEXTURE_LOADING_FAILED" << "\n";
+	}
+
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	SOIL_free_image_data(image);
+	return texture;
+}
+
 
 int main()
 {
@@ -221,32 +254,9 @@ int main()
 	glBindVertexArray(0);
 
 	//TEXTURE INIT
-	int image_width = 0;
-	int image_height = 0;
-	unsigned char* image = SOIL_load_image("Images/Dagger.png", &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
-
-	GLuint texture0;
-	glGenTextures(1, &texture0);
-	glBindTexture(GL_TEXTURE_2D, texture0);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	if (image)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "ERROR::TEXTURE_LOADING_FAILED" << "\n";
-	}
-
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	SOIL_free_image_data(image);
+	list<GLuint> Textures;
+	Textures.push_back(LoadTexture("Images/Parrying_Dagger.png"));
+	Textures.push_back(LoadTexture("Images/wallhaven-698267.png"));
 
 	//MAIN LOOP
 	while (!glfwWindowShouldClose(window))
@@ -267,10 +277,15 @@ int main()
 
 		//Update uniforms
 		glUniform1i(glGetUniformLocation(core_program, "texture0"), 0);
+		glUniform1i(glGetUniformLocation(core_program, "texture1"), 1);
 
 		//Active texture
+		list<GLuint> Test;
+		Test.
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture0);
+		glBindTexture(GL_TEXTURE_2D, Textures.front());
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, Textures.front());
 
 		//Bind vertex array object
 		glBindVertexArray(VAO);
