@@ -254,7 +254,7 @@ int main()
 	glBindVertexArray(0);
 
 	//TEXTURE INIT
-	list<GLuint> Textures;
+	vector<GLuint> Textures;
 	Textures.push_back(LoadTexture("Images/Parrying_Dagger.png"));
 	Textures.push_back(LoadTexture("Images/wallhaven-698267.png"));
 
@@ -280,12 +280,10 @@ int main()
 		glUniform1i(glGetUniformLocation(core_program, "texture1"), 1);
 
 		//Active texture
-		list<GLuint> Test;
-		Test.
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, Textures.front());
+		glBindTexture(GL_TEXTURE_2D, Textures[0]);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, Textures.front());
+		glBindTexture(GL_TEXTURE_2D, Textures[1]);
 
 		//Bind vertex array object
 		glBindVertexArray(VAO);
