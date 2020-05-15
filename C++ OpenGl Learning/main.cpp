@@ -169,8 +169,8 @@ int main()
 	glfwInit();
 
 	//CREATE WINDOW
-	const int WINDOW_WIDTH = 640;
-	const int WINDOW_HEIGHT = 480;
+	const int WINDOW_WIDTH = 1920;
+	const int WINDOW_HEIGHT = 1080;
 	int framebufferWitdh = 0;
 	int framebufferHeight = 0;
 
@@ -243,10 +243,10 @@ int main()
 		//Position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
 	glEnableVertexAttribArray(0);
-		//Color
+	//Color
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
 	glEnableVertexAttribArray(1);
-		//Texcoord
+	//Texcoord
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
 	glEnableVertexAttribArray(2);
 
@@ -255,18 +255,35 @@ int main()
 
 	//TEXTURE INIT
 	vector<GLuint> Textures;
-	Textures.push_back(LoadTexture("Images/Parrying_Dagger.png"));
 	Textures.push_back(LoadTexture("Images/wallhaven-698267.png"));
+	Textures.push_back(LoadTexture("Images/Parrying_Dagger.png"));
 
+	//world space
 	glm::mat4 ModelMatrix(1.f);
-	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f, 2.f, 0.f));
+	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f, 0.f, 0.f));
 	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
 	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 1.f, 0.f));
 	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));
 	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));
 
-	glUseProgram(core_program);
+	//camera view matrix
+	glm::vec3 camPostion(0.f);
+	glm::vec3 worldUp = glm::vec3(0.f, 1.f, 0.f);
+	glm::vec3 camFront = glm::vec3(0.f, 0.f, 1.f);
+	glm::mat4 ViewMatrix(1.f);
+	ViewMatrix = glm::lookAt(camPostion, camPostion + camFront, worldUp);
 
+	//camera 
+	float fov = 90.f;
+	float nearPlane = 0.1f;
+	float farPlane = 1000.f;
+	glm::mat4 ProjectionMatrix(1.f);
+	ProjectionMatrix = glm::perspective(glm::radians(fov), static_cast<float >(framebufferWitdh) / framebufferHeight, nearPlane, farPlane);
+
+		glUseProgram(core_program);
+
+	glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
 
 	glUseProgram(0);
@@ -293,7 +310,11 @@ int main()
 		glUniform1i(glGetUniformLocation(core_program, "texture1"), 1);
 
 		//Move, rotate, scalling
-
+		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f, 0.f, 0.f));
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f));
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(2.f), glm::vec3(0.f, 1.f, 0.f));
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));
 		glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
 
 		//Active texture
