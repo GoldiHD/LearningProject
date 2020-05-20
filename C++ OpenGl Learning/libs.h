@@ -1,12 +1,5 @@
 #pragma once
-#include<iostream>
-#include<fstream>
-#include<string>
 #include<vector>
-
-#include<glew.h>
-
-#include<glfw3.h>
 
 #include<glm.hpp>
 #include<vec2.hpp>
@@ -17,6 +10,8 @@
 #include<gtc\type_ptr.hpp>
 
 #include<Soil2.h>
+
+#include "Shader.h"
 
 
 struct  Vertex
