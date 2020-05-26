@@ -135,36 +135,6 @@ bool loadShader(GLuint& program)
 	return loadSuccess;
 }
 
-GLuint LoadTexture(const char* texturePath)
-{
-	int image_width = 0;
-	int image_height = 0;
-	unsigned char* image = SOIL_load_image(texturePath, &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
-
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	if (image)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "ERROR::TEXTURE_LOADING_FAILED" << "\n";
-	}
-
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	SOIL_free_image_data(image);
-	return texture;
-}
 
 void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale)
 {
@@ -258,11 +228,6 @@ int main()
 
 	//Shader Init
 	Shader core_program("vertex_core.glsl","fragment_core.glsl" );
-	//GLuint core_program;
-	//if (!loadShader(core_program))
-	//{
-	//	glfwTerminate();
-	//}
 
 	//Model
 
@@ -306,9 +271,8 @@ int main()
 	glBindVertexArray(0);
 
 	//TEXTURE INIT
-	vector<GLuint> Textures;
-	Textures.push_back(LoadTexture("Images/Parrying_Dagger.png"));
-	Textures.push_back(LoadTexture("Images/wallhaven-698267.png"));
+	Texture texture0("Images/Parrying_Dagger.png",GL_TEXTURE_2D, 0);
+	Texture texture1("Images/wallhaven-698267.png", GL_TEXTURE_2D, 1);
 
 	//INIT MATRICES
 	glm::vec3 position(0.f);
@@ -363,8 +327,8 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		//Update uniforms
-		core_program.Set1i(0, "texture0");
-		core_program.Set1i(1, "texture1");
+		core_program.Set1i(texture0.getTextureUnit(), "texture0");
+		core_program.Set1i(texture1.getTextureUnit(), "texture1");
 
 		//Move, rotate, scalling
 
@@ -384,10 +348,8 @@ int main()
 		core_program.Use();
 		
 		//Active texture
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, Textures[0]);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, Textures[1]);
+		texture0.bind();
+		texture1.bind();
 
 		//Bind vertex array object
 		glBindVertexArray(VAO);
