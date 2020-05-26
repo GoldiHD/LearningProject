@@ -1,15 +1,6 @@
 #pragma once
 
-#include<glew.h>
-
-#include<glfw3.h>
-
-#include<glm.hpp>
-#include<vec2.hpp>
-#include<vec3.hpp>
-#include<vec4.hpp>
-#include<mat4x4.hpp>
-#include<gtc\type_ptr.hpp>
+#include "Shader.h"
 
 class Material
 {
@@ -36,5 +27,12 @@ public:
 	}
 
 	//Function
-	void 
+	void sendToShader(Shader& program)
+	{
+		program.SetVector3f(this->ambient, "material.ambient");
+		program.SetVector3f(this->diffuse, "material.diffuse");
+		program.SetVector3f(this->specular, "material.specular");
+		program.Set1i(this->diffuseTex, "material.diffuseTex");
+		program.Set1i(this->specularTex, "material.specularTex");
+	}
 };

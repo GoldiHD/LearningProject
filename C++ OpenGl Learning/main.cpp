@@ -5,10 +5,10 @@ using namespace std;
 Vertex vertices[] =
 {
 	//Position						//Color						//Coord					//Normal
-	glm::vec3(-0.5f, 0.5f, 0.f),	glm::vec3(1.f,0.f,0.f),		glm::vec2(0.f, 1.f),	glm::vec3(0.f,0.f,-1.f),
-	glm::vec3(-0.5f, -0.5f, 0.f),	glm::vec3(0.f,1.f,0.f),		glm::vec2(0.f, 0.f),	glm::vec3(0.f,0.f,-1.f),
-	glm::vec3(0.5f, -0.5f, 0.f),    glm::vec3(0.f,0.f,1.f),		glm::vec2(1.f, 0.f),	glm::vec3(0.f,0.f,-1.f),
-	glm::vec3(0.5f, 0.5f, 0.f),		glm::vec3(1.f,1.f,0.f),		glm::vec2(1.f, 1.f),	glm::vec3(0.f,0.f,-1.f)
+	glm::vec3(-0.5f, 0.5f, 0.f),	glm::vec3(1.f,0.f,0.f),		glm::vec2(0.f, 1.f),	glm::vec3(0.f,0.f,1.f),
+	glm::vec3(-0.5f, -0.5f, 0.f),	glm::vec3(0.f,1.f,0.f),		glm::vec2(0.f, 0.f),	glm::vec3(0.f,0.f,1.f),
+	glm::vec3(0.5f, -0.5f, 0.f),    glm::vec3(0.f,0.f,1.f),		glm::vec2(1.f, 0.f),	glm::vec3(0.f,0.f,1.f),
+	glm::vec3(0.5f, 0.5f, 0.f),		glm::vec3(1.f,1.f,0.f),		glm::vec2(1.f, 1.f),	glm::vec3(0.f,0.f,1.f)
 };
 
 unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
@@ -136,41 +136,41 @@ bool loadShader(GLuint& program)
 }
 
 
-void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale)
+void updateInput(GLFWwindow* window, Mesh &mesh)
 {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		position.z += 0.01f;
+		mesh.move(glm::vec3(0.f, 0.f, 0.01f));
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		position.z -= 0.01f;
+		mesh.move(glm::vec3(0.f, 0.f, -0.01f));
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		position.x += 0.01f;
+		mesh.move(glm::vec3(0.f, 0.01f,0.f));
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		position.x -= 0.01f;
+		mesh.move(glm::vec3(0.f, -0.01f, 0.f));
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 	{
-		rotation.y -= 1.f;
+		mesh.Rotate(glm::vec3(0.f, 1.f, 0.f));
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
-		rotation.y += 1.f;
+		mesh.Rotate(glm::vec3(0.f, -1.f, 0.f));
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
 	{
-		scale += 0.1f;
+		mesh.scale()
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
@@ -229,62 +229,15 @@ int main()
 	//Shader Init
 	Shader core_program("vertex_core.glsl","fragment_core.glsl" );
 
-	//Model
-
-
-	//VBO, VBO, ERO
-	//GEN VAD AND BIND
-	GLuint VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-
-
-
-	//GEN VBO AND BIND AND SEND DATA
-	GLuint VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	//GEN EBO AND BIND AND SEND DATA
-	GLuint EBO;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	//SET VERTEXATTRIBPOINTERS AND ENABLE (Input ASSEMBLY)
-		//Position
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
-	glEnableVertexAttribArray(0);
-	//Color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
-	glEnableVertexAttribArray(1);
-	//Texcoord
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
-	glEnableVertexAttribArray(2);
-	//Normal
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-	glEnableVertexAttribArray(3);
-
-	//BIND VAO 0
-	glBindVertexArray(0);
+	//MODEL MESH
+	Mesh test(vertices, nrOfVertices, indices, nrOfIndices, glm::vec3(0.f), glm::vec3(10.f), glm::vec3(1.f));
 
 	//TEXTURE INIT
 	Texture texture0("Images/Parrying_Dagger.png",GL_TEXTURE_2D, 0);
 	Texture texture1("Images/wallhaven-698267.png", GL_TEXTURE_2D, 1);
 
-	//INIT MATRICES
-	glm::vec3 position(0.f);
-	glm::vec3 rotation(0.f);
-	glm::vec3 scale(1.f);
-
-	glm::mat4 ModelMatrix(1.f);
-	ModelMatrix = glm::translate(ModelMatrix, position);
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
-	ModelMatrix = glm::scale(ModelMatrix, scale);
+	//MATERIAL INIT
+	Material material0(glm::vec3(0.1f),glm::vec3(1.f), glm::vec3(1.f),texture0.getTextureUnit(), texture1.getTextureUnit());
 
 	//camera view matrix
 	glm::vec3 camPostion(0.f, 0.f, 1.f);
@@ -304,7 +257,6 @@ int main()
 	glm::vec3 lightPos0(0.f, 0.f, 1.f);
 
 	//INIT UNIFORMS
-	core_program.SetMat4fv(ModelMatrix, "ModelMatrix");
 	core_program.SetMat4fv(ViewMatrix, "ViewMatrix");
 	core_program.SetMat4fv(ProjectionMatrix, "ProjectionMatrix");
 
@@ -329,6 +281,7 @@ int main()
 		//Update uniforms
 		core_program.Set1i(texture0.getTextureUnit(), "texture0");
 		core_program.Set1i(texture1.getTextureUnit(), "texture1");
+		material0.sendToShader(core_program);
 
 		//Move, rotate, scalling
 
@@ -357,6 +310,7 @@ int main()
 		//Draw
 		//glDrawArrays(GL_TRIANGLES, 0, nrOfIndices);
 		glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
+		test.render(&core_program);
 
 		//End Draw
 		glfwSwapBuffers(window);
