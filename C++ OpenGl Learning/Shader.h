@@ -19,6 +19,8 @@ class Shader
 private:
 	//Member varbles
 	GLuint id;
+	const int versionMajor;
+	const int versionMinor;
 
 	//Privatefunctions
 	std::string loadShaderSource(const char* fileName)
@@ -43,6 +45,10 @@ private:
 		}
 
 		in_file.close();
+
+		std::string versionNr = std::to_string(this->versionMajor) + std::to_string(this->versionMinor) + "0";
+		//std::cout << src.replace(src.find("#version"), 12, "#version " + versionNr);
+
 		return src;
 	}
 
@@ -97,7 +103,7 @@ private:
 
 public:
 	//Constructors/Destructors
-	Shader(const char* vertexFile = "", const char* fragmentFile = "", const char* geometryFile = "")
+	Shader(const int versionMajor, const int versionMinor, const char* vertexFile = "", const char* fragmentFile = "", const char* geometryFile = "") : versionMajor(versionMajor), versionMinor(versionMinor)
 	{
 		GLuint vertexShader = 0;
 		GLuint geometryShader = 0;
