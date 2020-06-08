@@ -57,6 +57,16 @@ void Game::initOpenGLOptions()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
+void Game::initMatrices()
+{
+	this->ViewMatrix = glm::mat4(1.f);
+	this->ViewMatrix = glm::lookAt(this->camPosition, this->camPosition + this->camFront, this->worldUp);
+	this->ProjectionMatrix = glm::mat4(1.f);
+	this->ProjectionMatrix = glm::perspective(glm::radians(fov), static_cast<float>(this->framebufferWidth) / this->framebufferHeight, this->nearPlane, this->farPlane);
+
+}
+
+
 //Constructor/Destructor
 Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT, int GL_Version_Major, int GL_Version_Minor, bool resizable)
 	: WINDOW_WIDTH(WINDOW_WIDTH), WINDOW_HEIGHT(WINDOW_HEIGHT), GL_VERSION_MAJOR(GL_Version_Major), GL_VERSION_MINOR(GL_Version_Minor)
@@ -70,17 +80,10 @@ Game::Game(const char* title, const int WINDOW_WIDTH, const int WINDOW_HEIGHT, i
 	this->worldUp = glm::vec3(0.f, 1.f, 0.f);
 	this->camFront = glm::vec3(0.f, 0.f, -1.f);
 
-	this->ViewMatrix = glm::mat4(1.f);
-	ViewMatrix = glm::lookAt(this->camPosition, this->camPosition + this->camFront, this->worldUp);
-
 	//CAMERA 
 	this->fov = 90.f;
-
 	this->nearPlane = 0.1f;
 	this->farPlane = 1000.f;
-	this->ProjectionMatrix = glm::mat4(1.f);
-	this->ProjectionMatrix = glm::perspective(glm::radians(fov), static_cast<float>(this->framebufferWidth) / this->framebufferHeight, this->nearPlane, this->farPlane);
-
 
 	this->initGLFW();
 	this->initWindow(title, resizable);
@@ -111,12 +114,36 @@ void Game::setWindowShouldClose()
 //Functions
 void Game::update()
 {
-
+	//UPDATE INPUT---
+	glfwPollEvents();
 }
 
 void Game::render()
 {
 
+	//DRAW ---
+	//Clear
+	glClearColor(0.f, 0.f, 0.f, 1.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	//Update uniforms
+
+	//Update framebuffer size and projectionMatrix
+
+	//Use a program
+
+	//Active texture
+
+	//Draw
+
+	//End Draw
+	glfwSwapBuffers(window);
+	glFlush();
+
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Game::framebuffer_resize_callback(GLFWwindow* window, int fbW, int fbH)

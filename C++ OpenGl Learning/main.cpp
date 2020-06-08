@@ -89,41 +89,7 @@ GLFWwindow* createWindow(const char* title,const int width, const int height, in
 
 int main()
 {
-	//init GLFW
-	glfwInit();
-
-	//CREATE WINDOW
-	const int GlmajorVersion = 4;
-	const int GLminorVersion = 4;
-	const int WINDOW_WIDTH = 640;
-	const int WINDOW_HEIGHT = 480;
-	int framebufferWitdh = WINDOW_WIDTH;
-	int framebufferHeight = WINDOW_HEIGHT;
-
-	GLFWwindow* window = createWindow("Bugger", WINDOW_WIDTH, WINDOW_HEIGHT, framebufferWitdh, framebufferHeight, GlmajorVersion, GLminorVersion, false);
-
-	//INIT GLEW (NEEDS WINDOW AND OPTION CONTEXT)
-	glewExperimental = GL_TRUE;
-
-	//Error
-	if (glewInit() != GLEW_OK)
-	{
-		std::cout << "ERROR´::MAIN.cpp::GLEN_INIT_FAILED" << "\n";
-		glfwTerminate();
-	}
-
-	//OPENGL OPTIONS
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
-
-	glEnable(GL_BLEND);
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
+	Game game("Buggers", 640, 480, 4, 5, false);
 	//Seehader Init
 	Shader core_program(GlmajorVersion,GLminorVersion,"vertex_core.glsl","fragment_core.glsl" );
 

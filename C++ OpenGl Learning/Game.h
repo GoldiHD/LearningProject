@@ -27,6 +27,12 @@ private:
 	float nearPlane;
 	float farPlane;
 
+	//Shaders
+
+	//Textures
+
+	//Meshs
+
 //Private Functions
 	void initGLFW();
 	void initWindow(const char* title, bool resizable);
